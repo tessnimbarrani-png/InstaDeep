@@ -1,495 +1,352 @@
 
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>InstaAI Lab Manager</title>
-
-<style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
-}
-
-body {
-  background: #f5f7fb;
-  color: #17233c;
-}
-
-header {
-  background: #101d38;
-  color: white;
-  padding: 20px 8%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 15px;
-}
-
-.logo {
-  font-size: 22px;
-  font-weight: bold;
-  color: #55d6be;
-}
-
-nav a {
-  color: white;
-  text-decoration: none;
-  margin-left: 20px;
-  font-size: 14px;
-}
-
-nav a:hover {
-  color: #55d6be;
-}
-
-.hero {
-  padding: 65px 8%;
-  background: linear-gradient(120deg, #142746, #245b78);
-  color: white;
-  text-align: center;
-}
-
-.hero h1 {
-  font-size: 38px;
-  margin-bottom: 18px;
-}
-
-.hero p {
-  max-width: 650px;
-  margin: auto;
-  line-height: 1.7;
-  color: #e0eaf3;
-}
-
-button {
-  cursor: pointer;
-  border: none;
-  border-radius: 7px;
-  padding: 12px 22px;
-  font-weight: bold;
-}
-
-.hero button {
-  margin-top: 25px;
-  background: #55d6be;
-  color: #10213a;
-}
-
-.section {
-  padding: 50px 8%;
-}
-
-.section h2 {
-  text-align: center;
-  margin-bottom: 12px;
-}
-
-.description {
-  text-align: center;
-  color: #68758a;
-  margin-bottom: 30px;
-  line-height: 1.6;
-}
-
-.cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 20px;
-}
-
-.card {
-  background: white;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px #17233c12;
-  border: 1px solid #e8edf3;
-}
-
-.card .icon {
-  font-size: 30px;
-  margin-bottom: 12px;
-}
-
-.card h3 {
-  margin-bottom: 12px;
-  color: #183b59;
-}
-
-.card p {
-  color: #68758a;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-/* DASHBOARD */
-
-.dashboard-section {
-  padding: 55px 8%;
-}
-
-.dashboard-title {
-  margin-bottom: 8px;
-}
-
-.dashboard-subtitle {
-  color: #68758a;
-  margin-bottom: 25px;
-}
-
-.stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 18px;
-  margin-bottom: 30px;
-}
-
-.stat-card {
-  padding: 22px;
-  border-radius: 12px;
-  background: white;
-  border: 1px solid #e8edf3;
-  box-shadow: 0 4px 15px #17233c10;
-}
-
-.stat-icon {
-  font-size: 25px;
-  margin-bottom: 10px;
-}
-
-.stat-number {
-  font-size: 30px;
-  font-weight: bold;
-  margin: 8px 0;
-}
-
-.blue { color: #2864b4; }
-.green { color: #16845b; }
-.orange { color: #b7791f; }
-.purple { color: #7650b8; }
-
-.panel {
-  background: white;
-  padding: 25px;
-  border-radius: 12px;
-  border: 1px solid #e8edf3;
-  margin-bottom: 25px;
-  box-shadow: 0 4px 15px #17233c10;
-}
-
-.panel h3 {
-  margin-bottom: 20px;
-  color: #183b59;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th, td {
-  padding: 14px 10px;
-  text-align: left;
-  border-bottom: 1px solid #edf0f5;
-  font-size: 14px;
-}
-
-th {
-  color: #68758a;
-  background: #f8faff;
-}
-
-.status {
-  padding: 6px 10px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-.completed {
-  background: #e5f7f0;
-  color: #16845b;
-}
-
-.running {
-  background: #fff3df;
-  color: #b7791f;
-}
-
-.pending {
-  background: #f0eafe;
-  color: #7650b8;
-}
-
-.chart-row {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin: 20px 0;
-}
-
-.chart-label {
-  width: 90px;
-  font-size: 14px;
-}
-
-.chart-track {
-  flex: 1;
-  height: 13px;
-  background: #edf0f5;
-  border-radius: 20px;
-  overflow: hidden;
-}
-
-.chart-fill {
-  height: 100%;
-  background: #55b9a7;
-  border-radius: 20px;
-}
-
-.chart-value {
-  width: 42px;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-footer {
-  background: #101d38;
-  color: white;
-  text-align: center;
-  padding: 22px;
-  font-size: 13px;
-}
-
-@media(max-width: 650px) {
-  header {
-    justify-content: center;
-  }
-
-  nav a {
-    margin: 0 7px;
-  }
-
-  .hero h1 {
-    font-size: 29px;
-  }
-
-  .table-wrapper {
-    overflow-x: auto;
-  }
-}
-</style>
-</head>
-
-<body>
-
-<header>
-  <div class="logo">InstaAI Lab Manager</div>
-
-  <nav>
-    <a href="#accueil">Accueil</a>
-    <a href="#fonctionnalites">Fonctionnalités</a>
-    <a href="#dashboard">Dashboard</a>
-  </nav>
-</header>
-
-<section class="hero" id="accueil">
-  <h1>Manage Your AI Projects Easily</h1>
-
-  <p>
-    Une plateforme pour organiser les projets d'intelligence
-    artificielle, suivre les expériences et analyser les
-    performances des modèles.
-  </p>
-
-  <button onclick="goToDashboard()">Get Started</button>
-</section>
-
-<section class="section" id="fonctionnalites">
-  <h2>Our Main Features</h2>
-
-  <p class="description">
-    Organisez et suivez vos activités IA dans un seul espace.
-  </p>
-
-  <div class="cards">
-
-    <div class="card">
-      <div class="icon">📁</div>
-      <h3>AI Projects</h3>
-      <p>
-        Créer et organiser les projets IA et leurs datasets.
-      </p>
-    </div>
-
-    <div class="card">
-      <div class="icon">🤖</div>
-      <h3>AI Experiments</h3>
-      <p>
-        Créer des expériences et suivre leur avancement.
-      </p>
-    </div>
-
-    <div class="card">
-      <div class="icon">📊</div>
-      <h3>Performance Analysis</h3>
-      <p>
-        Consulter et comparer les performances des modèles IA.
-      </p>
-    </div>
-
-    <div class="card">
-      <div class="icon">📄</div>
-      <h3>Reports</h3>
-      <p>
-        Générer des rapports pour présenter les résultats.
-      </p>
-    </div>
-
-  </div>
-</section>
-
-<!-- REAL DASHBOARD -->
-
-<section class="dashboard-section" id="dashboard">
-
-  <h2 class="dashboard-title">AI Performance Dashboard</h2>
-
-  <p class="dashboard-subtitle">
-    Overview of AI projects and experiment performance.
-  </p>
-
-  <!-- STATISTICS -->
-
-  <div class="stats">
-
-    <div class="stat-card">
-      <div class="stat-icon">📁</div>
-      <p>AI Projects</p>
-      <div class="stat-number blue">12</div>
-      <small>Active projects</small>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-icon">🧪</div>
-      <p>Experiments</p>
-      <div class="stat-number green">28</div>
-      <small>Total experiments</small>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-icon">📈</div>
-      <p>Average Accuracy</p>
-      <div class="stat-number orange">85%</div>
-      <small>Model performance</small>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-icon">✅</div>
-      <p>Completed</p>
-      <div class="stat-number purple">20</div>
-      <small>Finished experiments</small>
-    </div>
-
-  </div>
-
-  <!-- EXPERIMENT TABLE -->
-
-  <div class="panel">
-    <h3>Recent AI Experiments</h3>
-
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>Experiment</th>
-            <th>Model</th>
-            <th>Accuracy</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <tr>
-            <td>Image Recognition</td>
-            <td>CNN</td>
-            <td>85%</td>
-            <td><span class="status completed">Completed</span></td>
-          </tr>
-
-          <tr>
-            <td>Text Analysis</td>
-            <td>NLP</td>
-            <td>92%</td>
-            <td><span class="status running">Running</span></td>
-          </tr>
-
-          <tr>
-            <td>Prediction Model</td>
-            <td>Machine Learning</td>
-            <td>78%</td>
-            <td><span class="status completed">Completed</span></td>
-          </tr>
-
-          <tr>
-            <td>Data Classification</td>
-            <td>Deep Learning</td>
-            <td>--</td>
-            <td><span class="status pending">Pending</span></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- PERFORMANCE CHART -->
-
-  <div class="panel">
-    <h3>Model Performance</h3>
-
-    <div class="chart-row">
-      <div class="chart-label">Model A</div>
-      <div class="chart-track">
-        <div class="chart-fill" style="width:85%"></div>
-      </div>
-      <div class="chart-value">85%</div>
-    </div>
-
-    <div class="chart-row">
-      <div class="chart-label">Model B</div>
-      <div class="chart-track">
-        <div class="chart-fill" style="width:92%"></div>
-      </div>
-      <div class="chart-value">92%</div>
-    </div>
-
-    <div class="chart-row">
-      <div class="chart-label">Model C</div>
-      <div class="chart-track">
-        <div class="chart-fill" style="width:78%"></div>
-      </div>
-      <div class="chart-value">78%</div>
-    </div>
-
-  </div>
-
-</section>
-
-<footer>
-  © 2026 InstaAI Lab Manager - Academic Project
-</footer>
-
-<script>
-function goToDashboard() {
-  document.getElementById("dashboard").scrollIntoView({
-    behavior: "smooth"
-  });
-}
-</script>
-
-</body>
-</html>
+import streamlit as st
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import linprog
+
+# =====================================
+# 1. CONFIGURATION
+# =====================================
+
+st.set_page_config(
+    page_title="AI Budget Optimizer",
+    page_icon="📊",
+    layout="wide"
+)
+
+st.title("🤖 AI-Based Budget Allocation")
+st.subheader("Financial Decision Optimization System")
+
+st.write(
+    "An intelligent decision-support system that helps "
+    "companies optimize investment allocation across projects."
+)
+
+st.divider()
+
+# =====================================
+# 2. COMPANY INFORMATION
+# =====================================
+
+st.header("1. Company Information")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    company = st.text_input(
+        "Company Name",
+        value="InstaDeep"
+    )
+
+with col2:
+    currency = st.selectbox(
+        "Currency",
+        ["TND", "EUR", "USD"]
+    )
+
+budget = st.number_input(
+    "Total Available Budget",
+    min_value=0.0,
+    value=500000.0,
+    step=10000.0
+)
+
+# =====================================
+# 3. PROJECT INFORMATION
+# =====================================
+
+st.header("2. Investment Projects")
+
+st.write(
+    "Add the projects you want to evaluate. "
+    "You can modify the example data or add new projects."
+)
+
+initial_projects = pd.DataFrame({
+    "Project": [
+        "AI Healthcare",
+        "AI Logistics",
+        "AI Finance"
+    ],
+    "Expected ROI (%)": [25.0, 18.0, 30.0],
+    "Risk (1-5)": [2, 3, 4],
+    "Min Investment": [50000.0, 50000.0, 50000.0],
+    "Max Investment": [300000.0, 250000.0, 300000.0]
+})
+
+if "projects" not in st.session_state:
+    st.session_state.projects = initial_projects.copy()
+
+projects = st.data_editor(
+    st.session_state.projects,
+    num_rows="dynamic",
+    use_container_width=True,
+    key="project_editor",
+    column_config={
+        "Expected ROI (%)": st.column_config.NumberColumn(
+            min_value=0.0,
+            max_value=1000.0
+        ),
+        "Risk (1-5)": st.column_config.NumberColumn(
+            min_value=1,
+            max_value=5,
+            step=1
+        ),
+        "Min Investment": st.column_config.NumberColumn(
+            min_value=0.0
+        ),
+        "Max Investment": st.column_config.NumberColumn(
+            min_value=0.0
+        )
+    }
+)
+
+risk_penalty = st.slider(
+    "Risk penalty (% per risk point)",
+    min_value=0.0,
+    max_value=5.0,
+    value=1.0,
+    step=0.5
+)
+
+# =====================================
+# 4. OPTIMIZATION MODEL
+# =====================================
+
+st.divider()
+st.header("3. Financial Optimization")
+
+if st.button("🚀 Optimize Budget Allocation", type="primary"):
+
+    try:
+        data = projects.copy()
+
+        data["Project"] = data["Project"].astype(str).str.strip()
+
+        numeric_columns = [
+            "Expected ROI (%)",
+            "Risk (1-5)",
+            "Min Investment",
+            "Max Investment"
+        ]
+
+        for col in numeric_columns:
+            data[col] = pd.to_numeric(data[col], errors="coerce")
+
+        data = data.dropna()
+
+        if budget <= 0:
+            st.error("Please enter a positive budget.")
+
+        elif len(data) == 0:
+            st.error("Please add at least one valid project.")
+
+        elif data["Project"].eq("").any():
+            st.error("Every project must have a name.")
+
+        elif data["Project"].duplicated().any():
+            st.error("Project names must be unique.")
+
+        elif (
+            (data["Risk (1-5)"] < 1).any()
+            or (data["Risk (1-5)"] > 5).any()
+            or (data["Risk (1-5)"] % 1 != 0).any()
+        ):
+            st.error("Risk must be an integer between 1 and 5.")
+
+        elif (
+            (data["Expected ROI (%)"] < 0).any()
+            or (data["Min Investment"] < 0).any()
+            or (data["Max Investment"] < 0).any()
+        ):
+            st.error("Financial values cannot be negative.")
+
+        elif (
+            (data["Min Investment"] > data["Max Investment"]).any()
+        ):
+            st.error("Minimum investment cannot exceed maximum investment.")
+
+        elif data["Min Investment"].sum() > budget:
+            st.error("The budget is insufficient to cover all minimum investments.")
+
+        else:
+            # Risk-adjusted expected return
+            data["Adjusted ROI"] = (
+                data["Expected ROI (%)"]
+                - risk_penalty * data["Risk (1-5)"]
+            )
+
+            # Objective: maximize risk-adjusted return
+            objective = -data["Adjusted ROI"].to_numpy() / 100
+
+            # Total allocation cannot exceed available budget
+            A_ub = np.ones((1, len(data)))
+            b_ub = [budget]
+
+            # Investment constraints
+            bounds = list(zip(
+                data["Min Investment"],
+                np.minimum(data["Max Investment"], budget)
+            ))
+
+            result = linprog(
+                c=objective,
+                A_ub=A_ub,
+                b_ub=b_ub,
+                bounds=bounds,
+                method="highs"
+            )
+
+            if result.success:
+
+                data["Recommended Allocation"] = result.x
+
+                data["Expected Profit"] = (
+                    data["Recommended Allocation"]
+                    * data["Expected ROI (%)"] / 100
+                )
+
+                data["Risk-Adjusted Return (%)"] = data["Adjusted ROI"]
+
+                total_invested = data["Recommended Allocation"].sum()
+                total_profit = data["Expected Profit"].sum()
+                remaining_budget = budget - total_invested
+
+                # =====================================
+                # 5. RESULTS
+                # =====================================
+
+                st.success(
+                    f"Optimization completed successfully for {company}!"
+                )
+
+                st.header("4. Optimization Results")
+
+                c1, c2, c3, c4 = st.columns(4)
+
+                c1.metric(
+                    "Available Budget",
+                    f"{budget:,.2f} {currency}"
+                )
+
+                c2.metric(
+                    "Total Invested",
+                    f"{total_invested:,.2f} {currency}"
+                )
+
+                c3.metric(
+                    "Expected Profit",
+                    f"{total_profit:,.2f} {currency}"
+                )
+
+                c4.metric(
+                    "Remaining Budget",
+                    f"{remaining_budget:,.2f} {currency}"
+                )
+
+                st.subheader("Recommended Budget Allocation")
+
+                display_data = data[[
+                    "Project",
+                    "Recommended Allocation",
+                    "Expected ROI (%)",
+                    "Risk (1-5)",
+                    "Expected Profit",
+                    "Risk-Adjusted Return (%)"
+                ]].copy()
+
+                st.dataframe(
+                    display_data.style.format({
+                        "Recommended Allocation": "{:,.2f}",
+                        "Expected ROI (%)": "{:.2f}%",
+                        "Expected Profit": "{:,.2f}",
+                        "Risk-Adjusted Return (%)": "{:.2f}%"
+                    }),
+                    use_container_width=True
+                )
+
+                # =====================================
+                # 6. CHARTS
+                # =====================================
+
+                st.subheader("Budget Distribution")
+
+                chart_data = data.set_index("Project")[
+                    "Recommended Allocation"
+                ]
+
+                st.bar_chart(chart_data)
+
+                st.subheader("Expected Profit by Project")
+
+                profit_data = data.set_index("Project")[
+                    "Expected Profit"
+                ]
+
+                st.bar_chart(profit_data)
+
+                # =====================================
+                # 7. RECOMMENDATIONS
+                # =====================================
+
+                st.header("5. AI Decision Recommendations")
+
+                best_project = data.loc[
+                    data["Adjusted ROI"].idxmax()
+                ]
+
+                st.write(
+                    f"🏆 **Best risk-adjusted project:** "
+                    f"{best_project['Project']}"
+                )
+
+                st.write(
+                    f"Recommended investment: "
+                    f"{best_project['Recommended Allocation']:,.2f} "
+                    f"{currency}"
+                )
+
+                high_risk = data[data["Risk (1-5)"] >= 4]
+
+                if not high_risk.empty:
+                    st.warning(
+                        "Some projects have a high risk level. "
+                        "Review them before investing."
+                    )
+
+                    st.write(high_risk["Project"].tolist())
+
+                if remaining_budget > 0.01:
+                    st.info(
+                        f"{remaining_budget:,.2f} {currency} "
+                        "remains unallocated. It can be reserved "
+                        "for future opportunities."
+                    )
+
+                # =====================================
+                # 8. DOWNLOAD RESULTS
+                # =====================================
+
+                csv = data.to_csv(index=False).encode("utf-8")
+
+                st.download_button(
+                    label="📥 Download Financial Report",
+                    data=csv,
+                    file_name="financial_optimization.csv",
+                    mime="text/csv"
+                )
+
+            else:
+                st.error(
+                    "Optimization failed: " + result.message
+                )
+
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
+
+st.divider()
+
+st.caption(
+    "AI Financial Decision Support System | Academic Project | InstaDeep Case Study"
+)
