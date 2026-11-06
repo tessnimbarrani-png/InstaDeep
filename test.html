@@ -1,352 +1,125 @@
 
-import streamlit as st
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.optimize import linprog
-
-# =====================================
-# 1. CONFIGURATION
-# =====================================
-
-st.set_page_config(
-    page_title="AI Budget Optimizer",
-    page_icon="📊",
-    layout="wide"
-)
-
-st.title("🤖 AI-Based Budget Allocation")
-st.subheader("Financial Decision Optimization System")
-
-st.write(
-    "An intelligent decision-support system that helps "
-    "companies optimize investment allocation across projects."
-)
-
-st.divider()
-
-# =====================================
-# 2. COMPANY INFORMATION
-# =====================================
-
-st.header("1. Company Information")
-
-col1, col2 = st.columns(2)
-
-with col1:
-    company = st.text_input(
-        "Company Name",
-        value="InstaDeep"
-    )
-
-with col2:
-    currency = st.selectbox(
-        "Currency",
-        ["TND", "EUR", "USD"]
-    )
-
-budget = st.number_input(
-    "Total Available Budget",
-    min_value=0.0,
-    value=500000.0,
-    step=10000.0
-)
-
-# =====================================
-# 3. PROJECT INFORMATION
-# =====================================
-
-st.header("2. Investment Projects")
-
-st.write(
-    "Add the projects you want to evaluate. "
-    "You can modify the example data or add new projects."
-)
-
-initial_projects = pd.DataFrame({
-    "Project": [
-        "AI Healthcare",
-        "AI Logistics",
-        "AI Finance"
-    ],
-    "Expected ROI (%)": [25.0, 18.0, 30.0],
-    "Risk (1-5)": [2, 3, 4],
-    "Min Investment": [50000.0, 50000.0, 50000.0],
-    "Max Investment": [300000.0, 250000.0, 300000.0]
-})
-
-if "projects" not in st.session_state:
-    st.session_state.projects = initial_projects.copy()
-
-projects = st.data_editor(
-    st.session_state.projects,
-    num_rows="dynamic",
-    use_container_width=True,
-    key="project_editor",
-    column_config={
-        "Expected ROI (%)": st.column_config.NumberColumn(
-            min_value=0.0,
-            max_value=1000.0
-        ),
-        "Risk (1-5)": st.column_config.NumberColumn(
-            min_value=1,
-            max_value=5,
-            step=1
-        ),
-        "Min Investment": st.column_config.NumberColumn(
-            min_value=0.0
-        ),
-        "Max Investment": st.column_config.NumberColumn(
-            min_value=0.0
-        )
-    }
-)
-
-risk_penalty = st.slider(
-    "Risk penalty (% per risk point)",
-    min_value=0.0,
-    max_value=5.0,
-    value=1.0,
-    step=0.5
-)
-
-# =====================================
-# 4. OPTIMIZATION MODEL
-# =====================================
-
-st.divider()
-st.header("3. Financial Optimization")
-
-if st.button("🚀 Optimize Budget Allocation", type="primary"):
-
-    try:
-        data = projects.copy()
-
-        data["Project"] = data["Project"].astype(str).str.strip()
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InstaDeep - AI Budget Optimizer</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<header>
+    <h1>InstaDeep</h1>
+    <p>AI-Based Budget Allocation & Financial Decision Optimization</p>
+</header>
+
+<main>
+
+    <section class="card">
+        <h2>1. Company Information</h2>
+
+        <label>Company Name</label>
+        <input type="text" id="company" placeholder="Enter company name">
+
+        <label>Total Available Budget</label>
+        <input type="number" id="budget" placeholder="Example: 500000">
+
+        <label>Currency</label>
+        <select id="currency">
+            <option value="TND">TND</option>
+            <option value="EUR">EUR</option>
+            <option value="USD">USD</option>
+        </select>
+    </section>
+
+    <section class="card">
+        <h2>2. Investment Projects</h2>
+
+        <div id="projects"></div>
+
+        <button class="secondary" onclick="addProject()">
+            + Add Project
+        </button>
+    </section>
+
+    <section class="card">
+        <h2>3. Optimization Settings</h2>
+
+        <label>Risk Penalty: <span id="riskValue">1</span></label>
+        <input type="range" id="riskPenalty"
+               min="0" max="5" step="0.5" value="1"
+               oninput="riskValue.textContent=this.value">
+
+        <button class="primary" onclick="optimizeBudget()">
+            Optimize Budget Allocation
+        </button>
+    </section>
+
+    <section id="results" class="card hidden">
+        <h2>4. Financial Results</h2>
+
+        <h3 id="companyTitle"></h3>
+
+        <div class="metrics">
+            <div class="metric">
+                <p>Available Budget</p>
+                <strong id="available"></strong>
+            </div>
+
+            <div class="metric">
+                <p>Total Invested</p>
+                <strong id="invested"></strong>
+            </div>
+
+            <div class="metric">
+                <p>Expected Profit</p>
+                <strong id="profit"></strong>
+            </div>
+
+            <div class="metric">
+                <p>Remaining Budget</p>
+                <strong id="remaining"></strong>
+            </div>
+        </div>
+
+        <h3>Recommended Allocation</h3>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Project</th>
+                        <th>Investment</th>
+                        <th>ROI</th>
+                        <th>Risk</th>
+                        <th>Expected Profit</th>
+                    </tr>
+                </thead>
+                <tbody id="resultTable"></tbody>
+            </table>
+        </div>
 
-        numeric_columns = [
-            "Expected ROI (%)",
-            "Risk (1-5)",
-            "Min Investment",
-            "Max Investment"
-        ]
+        <h3>Budget Distribution</h3>
+        <canvas id="budgetChart"></canvas>
 
-        for col in numeric_columns:
-            data[col] = pd.to_numeric(data[col], errors="coerce")
-
-        data = data.dropna()
+        <h3>AI Decision Recommendations</h3>
+        <div id="recommendations"></div>
 
-        if budget <= 0:
-            st.error("Please enter a positive budget.")
-
-        elif len(data) == 0:
-            st.error("Please add at least one valid project.")
-
-        elif data["Project"].eq("").any():
-            st.error("Every project must have a name.")
-
-        elif data["Project"].duplicated().any():
-            st.error("Project names must be unique.")
+        <button class="secondary" onclick="downloadReport()">
+            Download Financial Report (CSV)
+        </button>
+    </section>
 
-        elif (
-            (data["Risk (1-5)"] < 1).any()
-            or (data["Risk (1-5)"] > 5).any()
-            or (data["Risk (1-5)"] % 1 != 0).any()
-        ):
-            st.error("Risk must be an integer between 1 and 5.")
-
-        elif (
-            (data["Expected ROI (%)"] < 0).any()
-            or (data["Min Investment"] < 0).any()
-            or (data["Max Investment"] < 0).any()
-        ):
-            st.error("Financial values cannot be negative.")
-
-        elif (
-            (data["Min Investment"] > data["Max Investment"]).any()
-        ):
-            st.error("Minimum investment cannot exceed maximum investment.")
-
-        elif data["Min Investment"].sum() > budget:
-            st.error("The budget is insufficient to cover all minimum investments.")
-
-        else:
-            # Risk-adjusted expected return
-            data["Adjusted ROI"] = (
-                data["Expected ROI (%)"]
-                - risk_penalty * data["Risk (1-5)"]
-            )
-
-            # Objective: maximize risk-adjusted return
-            objective = -data["Adjusted ROI"].to_numpy() / 100
-
-            # Total allocation cannot exceed available budget
-            A_ub = np.ones((1, len(data)))
-            b_ub = [budget]
-
-            # Investment constraints
-            bounds = list(zip(
-                data["Min Investment"],
-                np.minimum(data["Max Investment"], budget)
-            ))
-
-            result = linprog(
-                c=objective,
-                A_ub=A_ub,
-                b_ub=b_ub,
-                bounds=bounds,
-                method="highs"
-            )
-
-            if result.success:
-
-                data["Recommended Allocation"] = result.x
-
-                data["Expected Profit"] = (
-                    data["Recommended Allocation"]
-                    * data["Expected ROI (%)"] / 100
-                )
-
-                data["Risk-Adjusted Return (%)"] = data["Adjusted ROI"]
-
-                total_invested = data["Recommended Allocation"].sum()
-                total_profit = data["Expected Profit"].sum()
-                remaining_budget = budget - total_invested
-
-                # =====================================
-                # 5. RESULTS
-                # =====================================
-
-                st.success(
-                    f"Optimization completed successfully for {company}!"
-                )
-
-                st.header("4. Optimization Results")
-
-                c1, c2, c3, c4 = st.columns(4)
-
-                c1.metric(
-                    "Available Budget",
-                    f"{budget:,.2f} {currency}"
-                )
-
-                c2.metric(
-                    "Total Invested",
-                    f"{total_invested:,.2f} {currency}"
-                )
-
-                c3.metric(
-                    "Expected Profit",
-                    f"{total_profit:,.2f} {currency}"
-                )
-
-                c4.metric(
-                    "Remaining Budget",
-                    f"{remaining_budget:,.2f} {currency}"
-                )
-
-                st.subheader("Recommended Budget Allocation")
-
-                display_data = data[[
-                    "Project",
-                    "Recommended Allocation",
-                    "Expected ROI (%)",
-                    "Risk (1-5)",
-                    "Expected Profit",
-                    "Risk-Adjusted Return (%)"
-                ]].copy()
-
-                st.dataframe(
-                    display_data.style.format({
-                        "Recommended Allocation": "{:,.2f}",
-                        "Expected ROI (%)": "{:.2f}%",
-                        "Expected Profit": "{:,.2f}",
-                        "Risk-Adjusted Return (%)": "{:.2f}%"
-                    }),
-                    use_container_width=True
-                )
-
-                # =====================================
-                # 6. CHARTS
-                # =====================================
-
-                st.subheader("Budget Distribution")
-
-                chart_data = data.set_index("Project")[
-                    "Recommended Allocation"
-                ]
-
-                st.bar_chart(chart_data)
-
-                st.subheader("Expected Profit by Project")
-
-                profit_data = data.set_index("Project")[
-                    "Expected Profit"
-                ]
-
-                st.bar_chart(profit_data)
-
-                # =====================================
-                # 7. RECOMMENDATIONS
-                # =====================================
-
-                st.header("5. AI Decision Recommendations")
-
-                best_project = data.loc[
-                    data["Adjusted ROI"].idxmax()
-                ]
-
-                st.write(
-                    f"🏆 **Best risk-adjusted project:** "
-                    f"{best_project['Project']}"
-                )
-
-                st.write(
-                    f"Recommended investment: "
-                    f"{best_project['Recommended Allocation']:,.2f} "
-                    f"{currency}"
-                )
-
-                high_risk = data[data["Risk (1-5)"] >= 4]
-
-                if not high_risk.empty:
-                    st.warning(
-                        "Some projects have a high risk level. "
-                        "Review them before investing."
-                    )
-
-                    st.write(high_risk["Project"].tolist())
-
-                if remaining_budget > 0.01:
-                    st.info(
-                        f"{remaining_budget:,.2f} {currency} "
-                        "remains unallocated. It can be reserved "
-                        "for future opportunities."
-                    )
-
-                # =====================================
-                # 8. DOWNLOAD RESULTS
-                # =====================================
-
-                csv = data.to_csv(index=False).encode("utf-8")
-
-                st.download_button(
-                    label="📥 Download Financial Report",
-                    data=csv,
-                    file_name="financial_optimization.csv",
-                    mime="text/csv"
-                )
-
-            else:
-                st.error(
-                    "Optimization failed: " + result.message
-                )
-
-    except Exception as e:
-        st.error(f"An error occurred: {e}")
-
-st.divider()
-
-st.caption(
-    "AI Financial Decision Support System | Academic Project | InstaDeep Case Study"
-)
+</main>
+
+<footer>
+    AI Financial Decision Support System | Academic Project
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+</html>
