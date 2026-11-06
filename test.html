@@ -1,125 +1,327 @@
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InstaDeep - AI Budget Optimizer</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
+let projectCount = 0;
+let lastResults = [];
+let budgetChart = null;
 
-<body>
+// Add a new investment project
+function addProject(name = "", roi = 20, risk = 2, min = 0, max = 200000) {
 
-<header>
-    <h1>InstaDeep</h1>
-    <p>AI-Based Budget Allocation & Financial Decision Optimization</p>
-</header>
+    projectCount++;
 
-<main>
+    const container = document.getElementById("projects");
 
-    <section class="card">
-        <h2>1. Company Information</h2>
+    const div = document.createElement("div");
+    div.className = "project";
 
-        <label>Company Name</label>
-        <input type="text" id="company" placeholder="Enter company name">
-
-        <label>Total Available Budget</label>
-        <input type="number" id="budget" placeholder="Example: 500000">
-
-        <label>Currency</label>
-        <select id="currency">
-            <option value="TND">TND</option>
-            <option value="EUR">EUR</option>
-            <option value="USD">USD</option>
-        </select>
-    </section>
-
-    <section class="card">
-        <h2>2. Investment Projects</h2>
-
-        <div id="projects"></div>
-
-        <button class="secondary" onclick="addProject()">
-            + Add Project
-        </button>
-    </section>
-
-    <section class="card">
-        <h2>3. Optimization Settings</h2>
-
-        <label>Risk Penalty: <span id="riskValue">1</span></label>
-        <input type="range" id="riskPenalty"
-               min="0" max="5" step="0.5" value="1"
-               oninput="riskValue.textContent=this.value">
-
-        <button class="primary" onclick="optimizeBudget()">
-            Optimize Budget Allocation
-        </button>
-    </section>
-
-    <section id="results" class="card hidden">
-        <h2>4. Financial Results</h2>
-
-        <h3 id="companyTitle"></h3>
-
-        <div class="metrics">
-            <div class="metric">
-                <p>Available Budget</p>
-                <strong id="available"></strong>
-            </div>
-
-            <div class="metric">
-                <p>Total Invested</p>
-                <strong id="invested"></strong>
-            </div>
-
-            <div class="metric">
-                <p>Expected Profit</p>
-                <strong id="profit"></strong>
-            </div>
-
-            <div class="metric">
-                <p>Remaining Budget</p>
-                <strong id="remaining"></strong>
-            </div>
+    div.innerHTML = `
+        <div>
+            <label>Project Name</label>
+            <input class="p-name" value="${name}" placeholder="Project name">
         </div>
 
-        <h3>Recommended Allocation</h3>
-
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Project</th>
-                        <th>Investment</th>
-                        <th>ROI</th>
-                        <th>Risk</th>
-                        <th>Expected Profit</th>
-                    </tr>
-                </thead>
-                <tbody id="resultTable"></tbody>
-            </table>
+        <div>
+            <label>ROI (%)</label>
+            <input class="p-roi" type="number" min="0" value="${roi}">
         </div>
 
-        <h3>Budget Distribution</h3>
-        <canvas id="budgetChart"></canvas>
+        <div>
+            <label>Risk (1-5)</label>
+            <input class="p-risk" type="number" min="1" max="5" step="1" value="${risk}">
+        </div>
 
-        <h3>AI Decision Recommendations</h3>
-        <div id="recommendations"></div>
+        <div>
+            <label>Min Investment</label>
+            <input class="p-min" type="number" min="0" value="${min}">
+        </div>
 
-        <button class="secondary" onclick="downloadReport()">
-            Download Financial Report (CSV)
+        <div>
+            <label>Max Investment</label>
+            <input class="p-max" type="number" min="0" value="${max}">
+        </div>
+
+        <button class="remove" onclick="this.parentElement.remove()">
+            X
         </button>
-    </section>
+    `;
 
-</main>
+    container.appendChild(div);
+}
 
-<footer>
-    AI Financial Decision Support System | Academic Project
-</footer>
+// Initial example projects
+addProject("AI Healthcare", 25, 2, 50000, 300000);
+addProject("AI Logistics", 18, 3, 50000, 250000);
+addProject("AI Finance", 30, 4, 50000, 300000);
 
-<script src="script.js"></script>
 
-</body>
-</html>
+// Budget optimization
+function optimizeBudget() {
+
+    const company = document.getElementById("company").value.trim();
+    const budget = Number(document.getElementById("budget").value);
+    const currency = document.getElementById("currency").value;
+    const penalty = Number(document.getElementById("riskPenalty").value);
+
+    if (!company || !Number.isFinite(budget) || budget <= 0) {
+        alert("Please enter a valid company name and budget.");
+        return;
+    }
+
+    const rows = [...document.querySelectorAll(".project")];
+
+    if (rows.length === 0) {
+        alert("Please add at least one project.");
+        return;
+    }
+
+    const projects = rows.map(row => ({
+        name: row.querySelector(".p-name").value.trim(),
+        roi: Number(row.querySelector(".p-roi").value),
+        risk: Number(row.querySelector(".p-risk").value),
+        min: Number(row.querySelector(".p-min").value),
+        max: Number(row.querySelector(".p-max").value)
+    }));
+
+    for (const p of projects) {
+        if (
+            !p.name ||
+            !Number.isFinite(p.roi) || p.roi < 0 ||
+            !Number.isInteger(p.risk) || p.risk < 1 || p.risk > 5 ||
+            !Number.isFinite(p.min) || p.min < 0 ||
+            !Number.isFinite(p.max) || p.max < p.min
+        ) {
+            alert("Please verify all project information.");
+            return;
+        }
+    }
+
+    const names = projects.map(p => p.name.toLowerCase());
+
+    if (new Set(names).size !== names.length) {
+        alert("Project names must be unique.");
+        return;
+    }
+
+    const minTotal = projects.reduce((sum, p) => sum + p.min, 0);
+
+    if (minTotal > budget) {
+        alert("Your budget is insufficient for the minimum investments.");
+        return;
+    }
+
+    // Risk-adjusted ROI
+    projects.forEach(p => {
+        p.adjustedROI = p.roi - penalty * p.risk;
+        p.allocation = p.min;
+    });
+
+    // Sort projects by adjusted return
+    const ranked = [...projects].sort(
+        (a, b) => b.adjustedROI - a.adjustedROI
+    );
+
+    // Allocate the remaining budget to the best projects
+    let remaining = budget - minTotal;
+
+    for (const p of ranked) {
+
+        const available = p.max - p.min;
+        const allocation = Math.min(remaining, available);
+
+        p.allocation += allocation;
+        remaining -= allocation;
+
+        if (remaining <= 0.000001) break;
+    }
+
+    const invested = projects.reduce(
+        (sum, p) => sum + p.allocation, 0
+    );
+
+    const profit = projects.reduce(
+        (sum, p) => sum + p.allocation * p.roi / 100, 0
+    );
+
+    const remainingBudget = budget - invested;
+
+    projects.forEach(p => {
+        p.expectedProfit = p.allocation * p.roi / 100;
+    });
+
+    lastResults = projects.map(p => ({...p}));
+
+    displayResults(
+        company,
+        budget,
+        invested,
+        profit,
+        remainingBudget,
+        currency,
+        projects
+    );
+}
+
+
+// Display financial results
+function displayResults(
+    company, budget, invested, profit,
+    remaining, currency, projects
+) {
+
+    document.getElementById("results").classList.remove("hidden");
+
+    document.getElementById("companyTitle").textContent =
+        "Financial Report: " + company;
+
+    const money = value =>
+        value.toLocaleString("en-US", {
+            maximumFractionDigits: 2
+        }) + " " + currency;
+
+    document.getElementById("available").textContent = money(budget);
+    document.getElementById("invested").textContent = money(invested);
+    document.getElementById("profit").textContent = money(profit);
+    document.getElementById("remaining").textContent = money(remaining);
+
+    const table = document.getElementById("resultTable");
+
+    table.innerHTML = "";
+
+    projects.forEach(p => {
+
+        const tr = document.createElement("tr");
+
+        const values = [
+            p.name,
+            money(p.allocation),
+            p.roi + "%",
+            p.risk + "/5",
+            money(p.expectedProfit)
+        ];
+
+        values.forEach(value => {
+            const td = document.createElement("td");
+            td.textContent = value;
+            tr.appendChild(td);
+        });
+
+        table.appendChild(tr);
+    });
+
+    // Budget chart
+    if (budgetChart) {
+        budgetChart.destroy();
+    }
+
+    budgetChart = new Chart(
+        document.getElementById("budgetChart"),
+        {
+            type: "doughnut",
+            data: {
+                labels: projects.map(p => p.name),
+                datasets: [{
+                    data: projects.map(p => p.allocation)
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: "bottom"
+                    }
+                }
+            }
+        }
+    );
+
+    generateRecommendations(projects, remaining);
+}
+
+
+// Generate decision recommendations
+function generateRecommendations(projects, remaining) {
+
+    const container = document.getElementById("recommendations");
+
+    container.innerHTML = "";
+
+    const best = [...projects].sort(
+        (a, b) => b.adjustedROI - a.adjustedROI
+    )[0];
+
+    const recommendations = [
+        "🏆 Best risk-adjusted project: " + best.name,
+        "📊 Recommended investment: " +
+            best.allocation.toLocaleString("en-US"),
+        "💰 Expected profit: " +
+            projects.reduce((s, p) => s + p.expectedProfit, 0)
+                .toLocaleString("en-US"),
+        "⚖️ Review projects with high risk before investing."
+    ];
+
+    if (remaining > 0.01) {
+        recommendations.push(
+            "💡 Unallocated budget: " +
+            remaining.toLocaleString("en-US") +
+            ". Consider keeping it as a financial reserve."
+        );
+    }
+
+    recommendations.forEach(text => {
+
+        const p = document.createElement("p");
+        p.textContent = text;
+        p.style.margin = "12px 0";
+
+        container.appendChild(p);
+    });
+}
+
+
+// Export financial report
+function downloadReport() {
+
+    if (!lastResults.length) {
+        alert("Please optimize the budget first.");
+        return;
+    }
+
+    const headers = [
+        "Project",
+        "Investment",
+        "ROI",
+        "Risk",
+        "Expected Profit",
+        "Risk Adjusted ROI"
+    ];
+
+    const rows = lastResults.map(p => [
+        p.name,
+        p.allocation,
+        p.roi,
+        p.risk,
+        p.expectedProfit,
+        p.adjustedROI
+    ]);
+
+    const csv = [
+        headers,
+        ...rows
+    ].map(row =>
+        row.map(value =>
+            '"' + String(value).replace(/"/g, '""') + '"'
+        ).join(",")
+    ).join("\n");
+
+    const blob = new Blob(
+        ["\uFEFF" + csv],
+        {type: "text/csv;charset=utf-8;"}
+    );
+
+    const link = document.createElement("a");
+
+    link.href = URL.createObjectURL(blob);
+    link.download = "InstaDeep_Financial_Report.csv";
+    link.click();
+
+    URL.revokeObjectURL(link.href);
+}
