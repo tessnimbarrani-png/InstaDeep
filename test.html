@@ -1,25 +1,289 @@
-InstaDeep-Financial-AI/
-│
-├── data/
-│   ├── raw_data.csv
-│   └── cleaned_data.csv
-│
-├── sprint1_data_preparation/
-│   ├── data_collection.py
-│   ├── data_cleaning.py
-│   └── exploratory_analysis.py
-│
-├── sprint2_machine_learning/
-│   ├── feature_selection.py
-│   ├── prediction_model.py
-│   └── model_evaluation.py
-│
-├── sprint3_dashboard/
-│   ├── dashboard.py
-│   ├── financial_kpis.py
-│   ├── recommendations.py
-│   └── tests.py
-│
-├── models/
-├── requirements.txt
-└── README.md
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InstaAI Lab Manager</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f5f7fb;
+      color: #17233c;
+    }
+
+    header {
+      background: #101d38;
+      color: white;
+      padding: 20px 8%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .logo {
+      font-size: 23px;
+      font-weight: bold;
+      color: #55d6be;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 22px;
+      font-size: 14px;
+    }
+
+    nav a:hover {
+      color: #55d6be;
+    }
+
+    .hero {
+      padding: 75px 8%;
+      background: linear-gradient(120deg, #142746, #245b78);
+      color: white;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 38px;
+      margin-bottom: 18px;
+    }
+
+    .hero p {
+      max-width: 650px;
+      margin: auto;
+      line-height: 1.7;
+      color: #e0eaf3;
+    }
+
+    .hero button {
+      margin-top: 28px;
+      padding: 13px 25px;
+      border: none;
+      border-radius: 7px;
+      background: #55d6be;
+      color: #10213a;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .hero button:hover {
+      background: #36bda5;
+    }
+
+    .section {
+      padding: 55px 8%;
+    }
+
+    .section h2 {
+      text-align: center;
+      margin-bottom: 12px;
+      font-size: 27px;
+    }
+
+    .description {
+      text-align: center;
+      color: #68758a;
+      margin-bottom: 35px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 22px;
+    }
+
+    .card {
+      background: white;
+      padding: 27px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px #17233c12;
+      border: 1px solid #e8edf3;
+      transition: 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card .icon {
+      font-size: 32px;
+      margin-bottom: 15px;
+    }
+
+    .card h3 {
+      margin-bottom: 12px;
+      color: #183b59;
+    }
+
+    .card p {
+      color: #68758a;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .dashboard {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      margin-top: 20px;
+      text-align: center;
+      border: 1px solid #e8edf3;
+    }
+
+    .dashboard button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: #183b59;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    footer {
+      background: #101d38;
+      color: white;
+      text-align: center;
+      padding: 22px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        justify-content: center;
+      }
+
+      nav a {
+        margin: 0 7px;
+      }
+
+      .hero h1 {
+        font-size: 29px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo">InstaAI Lab Manager</div>
+
+    <nav>
+      <a href="#accueil">Accueil</a>
+      <a href="#dashboard">Dashboard</a>
+      <a href="#fonctionnalites">Fonctionnalités</a>
+    </nav>
+  </header>
+
+  <section class="hero" id="accueil">
+    <h1>Manage Your AI Projects Easily</h1>
+
+    <p>
+      Une plateforme pour organiser les projets d'intelligence
+      artificielle, suivre les expériences et analyser les
+      performances des modèles.
+    </p>
+
+    <button onclick="goToDashboard()">
+      Get Started
+    </button>
+  </section>
+
+  <section class="section" id="fonctionnalites">
+    <h2>Our Main Features</h2>
+
+    <p class="description">
+      Organisez et suivez toutes vos activités IA dans un seul espace.
+    </p>
+
+    <div class="cards">
+
+      <div class="card">
+        <div class="icon">📁</div>
+        <h3>AI Projects</h3>
+        <p>
+          Créer et organiser les projets d'intelligence artificielle
+          et leurs datasets.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="icon">🤖</div>
+        <h3>AI Experiments</h3>
+        <p>
+          Créer des expériences, choisir des modèles et suivre
+          leur avancement.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="icon">📊</div>
+        <h3>Performance Analysis</h3>
+        <p>
+          Consulter les résultats et comparer les performances
+          des modèles IA.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="icon">📄</div>
+        <h3>Reports</h3>
+        <p>
+          Préparer des rapports pour présenter les résultats
+          des expériences.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="section" id="dashboard">
+    <h2>Dashboard</h2>
+
+    <p class="description">
+      Accédez rapidement aux principales activités de votre équipe.
+    </p>
+
+    <div class="dashboard">
+      <h3>Welcome to InstaAI Lab Manager!</h3>
+      <p>
+        Gérez vos projets, vos expériences et vos résultats
+        depuis une seule plateforme.
+      </p>
+
+      <button onclick="showMessage()">
+        View Dashboard
+      </button>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2026 InstaAI Lab Manager - Academic Project</p>
+  </footer>
+
+  <script>
+    function goToDashboard() {
+      document.getElementById("dashboard").scrollIntoView({
+        behavior: "smooth"
+      });
+    }
+
+    function showMessage() {
+      alert("Welcome to your AI Dashboard!");
+    }
+  </script>
+
+</body>
+</html>
